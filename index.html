@@ -1,564 +1,477 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ukr Smp — Затишний Minecraft Сервер</title>
-    <!-- Підключення Tailwind CSS для сучасної адаптивної верстки -->
+    <title>Ukr Smp — Український Minecraft Сервер 1.21.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Підключення Google Fonts (Nunito та Inter для м'якої, читабельної типографіки) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Підключення іконок Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        display: ['Nunito', 'sans-serif'],
+                        pixel: ['"Press Start 2P"', 'monospace'],
                     },
                     colors: {
-                        cream: {
-                            pink: '#FFF0F5',
-                            peach: '#FFE5D9',
-                            soft: '#FFF9F5',
-                        },
-                        pastel: {
-                            pink: '#FADADD',
-                            rose: '#FFAFCC',
-                            peach: '#FFB5A7',
-                            apricot: '#FCD5CE',
-                            blue: '#BDE0FE',
-                            sky: '#A2D2FF',
-                            mint: '#D8E2DC',
-                        }
+                        obsidian: '#0b0e14',
+                        slateCard: '#131822',
+                        uaBlue: '#0057B7',
+                        uaSky: '#38bdf8',
+                        uaGold: '#FFD700',
+                        uaAmber: '#f59e0b',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Плавний градієнтний фон у заданій палітрі */
+        /* Кастомні стилі для воксельних акцентів та плавних переходів */
         body {
-            background: linear-gradient(135deg, #FFF0F5 0%, #FFE5D9 50%, #EBF5FF 100%);
-            min-height: 100vh;
-            color: #4A3F4B;
+            background-color: #0b0e14;
+            color: #f1f5f9;
+            overflow-x: hidden;
         }
-
-        /* Анімація появи вкладок */
-        .tab-content {
-            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        .voxel-border {
+            box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.45);
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .voxel-btn {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 0 0 #b45309;
         }
-
-        /* Стилізація скла (Glassmorphism) */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
+        .voxel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 0 #b45309;
+        }
+        .voxel-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #b45309;
+        }
+        .hero-glow {
+            background: radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.14), rgba(245, 158, 11, 0.08) 45%, transparent 75%);
+        }
+        .pixel-art {
+            image-rendering: auto;
         }
     </style>
 </head>
-<body class="antialiased selection:bg-pastel-rose selection:text-white flex flex-col justify-between">
+<body class="antialiased selection:bg-amber-400 selection:text-slate-950">
 
-    <!-- Спливаюче сповіщення про копіювання IP -->
+    <!-- Спливаюче сповіщення (Toast) -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-        <div class="bg-gradient-to-r from-[#FFB5A7] to-[#A2D2FF] text-slate-800 font-display font-bold px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 border border-white/80">
-            <div class="bg-white/90 p-1.5 rounded-xl text-emerald-500">
-                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-            </div>
-            <span>IP скопійовано! Чекаємо на сервері ✨</span>
+        <div class="flex items-center gap-3 bg-emerald-600 text-white px-5 py-3.5 rounded-xl shadow-2xl border border-emerald-400/40 font-semibold text-sm sm:text-base">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span id="toast-message">IP скопійовано: UkrSmpUa.aternos.me</span>
         </div>
     </div>
 
-    <!-- Верхня навігаційна панель -->
-    <header class="sticky top-0 z-40 px-4 pt-4 pb-2">
-        <nav class="max-w-5xl mx-auto glass-card rounded-3xl shadow-sm px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <!-- Логотип та назва сервера -->
-            <button onclick="switchTab('home')" class="flex items-center gap-3 group focus:outline-none">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FADADD] via-[#FFB5A7] to-[#BDE0FE] p-0.5 shadow-sm group-hover:scale-105 transition-transform">
-                    <div class="w-full h-full bg-white/90 rounded-[14px] flex items-center justify-center">
-                        <!-- Стилізований воксельний блок (SVG) -->
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" fill="#FFB5A7"/>
-                            <path d="M12 2L21 7L12 12L3 7L12 2Z" fill="#BDE0FE"/>
-                            <path d="M12 12L21 7V17L12 22V12Z" fill="#FADADD"/>
-                        </svg>
+    <!-- Навігація -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-obsidian/85 border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <!-- Логотип -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-b from-sky-400 via-sky-500 to-amber-400 p-0.5 shadow-lg group-hover:scale-105 transition-transform">
+                    <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-1/2 bg-sky-500/25"></div>
+                        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-amber-400/25"></div>
+                        <span class="font-pixel text-xs text-amber-300 relative z-10">UA</span>
                     </div>
                 </div>
-                <div class="text-left">
-                    <span class="font-display font-black text-xl tracking-tight bg-gradient-to-r from-rose-500 via-orange-400 to-sky-500 bg-clip-text text-transparent">
-                        Ukr Smp
-                    </span>
-                    <span class="block text-[11px] font-medium text-slate-500 -mt-1">Версія 1.21.8</span>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white leading-none">Ukr Smp</span>
+                    <span class="text-[11px] font-medium text-sky-400 mt-1">Java Edition • 1.21.8</span>
                 </div>
-            </button>
+            </a>
 
-            <!-- Кнопки навігації (3 вкладки) -->
-            <div class="flex items-center gap-1.5 sm:gap-2 bg-cream-soft/90 p-1.5 rounded-2xl border border-pastel-pink/40 w-full sm:w-auto justify-center">
-                <button id="nav-home" onclick="switchTab('home')" class="nav-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all duration-200 bg-gradient-to-r from-[#FADADD] to-[#FFE5D9] text-slate-800 shadow-sm">
-                    <i data-lucide="home" class="w-4 h-4 text-rose-500"></i>
-                    <span>Головна</span>
-                </button>
-                
-                <button id="nav-donate" onclick="switchTab('donate')" class="nav-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all duration-200 text-slate-600 hover:bg-white/60">
-                    <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>
-                    <span>Придбати привілегію</span>
-                </button>
-                
-                <button id="nav-rules" onclick="switchTab('rules')" class="nav-btn flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-all duration-200 text-slate-600 hover:bg-white/60">
-                    <i data-lucide="scroll-text" class="w-4 h-4 text-sky-500"></i>
-                    <span>Правила</span>
+            <!-- Навігаційні посилання (Desktop) -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#features" class="hover:text-amber-400 transition-colors">Переваги</a>
+                <a href="#gallery" class="hover:text-amber-400 transition-colors">Галерея</a>
+                <a href="#join" class="hover:text-amber-400 transition-colors">Як зайти</a>
+                <a href="#rules" class="hover:text-amber-400 transition-colors">Правила</a>
+            </nav>
+
+            <!-- Кнопка швидкого копіювання в шапці -->
+            <div class="flex items-center gap-3">
+                <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    1.21.8
+                </span>
+                <button onclick="copyServerIP()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-xs sm:text-sm font-semibold transition-all active:scale-95 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Скопіювати IP</span>
                 </button>
             </div>
-        </nav>
+        </div>
     </header>
 
-    <!-- Основний контент сторінки -->
-    <main class="max-w-5xl w-full mx-auto px-4 py-6 sm:py-10 flex-grow">
-
-        <!-- ========================================== -->
-        <!-- ВКЛАДКА 1: ГОЛОВНА                         -->
-        <!-- ========================================== -->
-        <section id="tab-home" class="tab-content space-y-8">
-            
-            <!-- Головний банер (Hero) -->
-            <div class="glass-card rounded-[2rem] p-6 sm:p-10 shadow-sm relative overflow-hidden">
-                <!-- Декоративні м'які плями на фоні картки -->
-                <div class="absolute -top-16 -right-16 w-56 h-56 bg-pastel-blue/40 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="absolute -bottom-16 -left-16 w-56 h-56 bg-pastel-pink/50 rounded-full blur-2xl pointer-events-none"></div>
-
-                <div class="relative z-10 text-center max-w-2xl mx-auto space-y-5">
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-pastel-peach text-xs font-display font-bold text-slate-700 shadow-xs">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>Сервер онлайн • Версія 1.21.8</span>
+    <!-- Головний екран (Hero Section) -->
+    <section class="relative pt-10 pb-16 sm:pt-16 sm:pb-24 hero-glow overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                
+                <!-- Ліва колонка: Текст та IP -->
+                <div class="lg:col-span-6 text-center lg:text-left space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-amber-400/30 text-amber-300 text-xs sm:text-sm font-semibold shadow-md">
+                        <span>🇺🇦</span>
+                        <span>Український приватний Vanilla+ сервер</span>
+                        <span class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 text-xs">v1.21.8</span>
                     </div>
 
-                    <h1 class="font-display font-black text-3xl sm:text-5xl text-slate-800 leading-tight">
-                        Ласкаво просимо на <br class="hidden sm:block">
-                        <span class="bg-gradient-to-r from-rose-400 via-orange-400 to-sky-400 bg-clip-text text-transparent">Ukr Smp</span>!
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+                        Ласкаво просимо на <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-amber-300 to-amber-500">Ukr Smp</span>
                     </h1>
 
-                    <p class="text-slate-600 text-base sm:text-lg leading-relaxed">
-                        Твій ідеальний ванільний світ із ламповою атмосферою, дружнім ком'юніті, красивими будівлями та захопливими івентами. Будуй, досліджуй та знаходь нових друзів!
+                    <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Затишний український світ виживання на найновішій версії <strong>Minecraft 1.21.8</strong>. Будуй масштабні проєкти, розвивай торгівлю на спавні, досліджуй Блідий Сад та знаходь нових друзів без токсичності та дисбалансного донату.
                     </p>
 
-                    <!-- Блок копіювання IP-адреси -->
-                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <div class="flex items-center justify-between gap-4 bg-white/95 border-2 border-pastel-peach/80 rounded-2xl px-5 py-3 shadow-xs w-full sm:w-auto">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 rounded-xl bg-cream-peach text-orange-500">
-                                    <i data-lucide="server" class="w-5 h-5"></i>
+                    <!-- Блок копіювання IP -->
+                    <div class="pt-2 max-w-xl mx-auto lg:mx-0">
+                        <div class="p-2 rounded-2xl bg-slate-900/95 border border-slate-700/80 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                            <div class="flex-1 flex items-center justify-between sm:justify-start gap-3 px-4 py-3 rounded-xl bg-obsidian/80 border border-slate-800">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                                    <code id="server-ip-text" class="text-sm sm:text-base font-bold text-amber-300 truncate select-all">UkrSmpUa.aternos.me</code>
                                 </div>
-                                <div class="text-left">
-                                    <span class="block text-[11px] uppercase tracking-wider font-bold text-slate-400">IP-адреса сервера</span>
-                                    <code id="server-ip" class="font-display font-extrabold text-base sm:text-lg text-slate-800 select-all">UkrSmpUa.aternos.me</code>
-                                </div>
+                                <span class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 bg-slate-800/90 px-2 py-0.5 rounded">Java 1.21.8</span>
                             </div>
-                            <button onclick="copyIP()" class="ml-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FFB5A7] via-[#FADADD] to-[#BDE0FE] hover:opacity-90 active:scale-95 text-slate-800 font-display font-bold text-sm transition-all flex items-center gap-2 shadow-xs cursor-pointer">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                                <span>Копіювати</span>
+
+                            <button onclick="copyServerIP()" id="hero-copy-btn" class="voxel-btn px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span id="hero-copy-label">Скопіювати IP</span>
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Галерея з 3 фотографій з папки а/ -->
-            <div class="space-y-4">
-                <div class="flex items-center justify-between px-2">
-                    <h2 class="font-display font-extrabold text-2xl text-slate-800 flex items-center gap-2.5">
-                        <span class="p-2 rounded-xl bg-pastel-blue/50 text-sky-600">
-                            <i data-lucide="camera" class="w-5 h-5"></i>
-                        </span>
-                        <span>Атмосфера нашого світу</span>
-                    </h2>
-                    <span class="text-xs font-semibold text-slate-500 bg-white/70 px-3 py-1 rounded-full">Папка а/</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Фото 1 з папки а/ -->
-                    <div class="glass-card rounded-3xl p-3 shadow-sm hover:-translate-y-1 transition-all duration-300 group">
-                        <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-cream-peach">
-                            <!-- Зображення з папки а/ із резервною SVG-заглушкою, якщо картинка ще відсутня -->
-                            <img src="а/photo1.jpg" alt="Атмосфера Ukr Smp 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="w-full h-full absolute inset-0 bg-gradient-to-br from-[#A2D2FF] via-[#FADADD] to-[#FFB5A7] flex-col items-center justify-center p-4 text-center hidden">
-                                <svg class="w-12 h-12 text-white/80 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                                <span class="font-display font-bold text-sm text-white drop-shadow-xs">а/photo1.jpg</span>
-                                <span class="text-[11px] text-white/90">Покладіть фото у папку «а»</span>
-                            </div>
-                            <div class="absolute top-3 left-3 bg-white/85 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-display font-bold text-rose-500">
-                                🌸 Долина Сакур
-                            </div>
-                        </div>
-                        <div class="pt-3 px-2 pb-1">
-                            <h3 class="font-display font-bold text-slate-800 text-lg">Чарівні заходи сонця</h3>
-                            <p class="text-slate-500 text-sm mt-0.5">Мальовничі біоми для твого затишного будиночка.</p>
-                        </div>
-                    </div>
-
-                    <!-- Фото 2 з папки а/ -->
-                    <div class="glass-card rounded-3xl p-3 shadow-sm hover:-translate-y-1 transition-all duration-300 group">
-                        <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-pastel-blue/30">
-                            <img src="а/photo2.jpg" alt="Атмосфера Ukr Smp 2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="w-full h-full absolute inset-0 bg-gradient-to-br from-[#BDE0FE] via-[#FFF0F5] to-[#FFB5A7] flex-col items-center justify-center p-4 text-center hidden">
-                                <svg class="w-12 h-12 text-white/80 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                                <span class="font-display font-bold text-sm text-white drop-shadow-xs">а/photo2.jpg</span>
-                                <span class="text-[11px] text-white/90">Покладіть фото у папку «а»</span>
-                            </div>
-                            <div class="absolute top-3 left-3 bg-white/85 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-display font-bold text-sky-600">
-                                🏰 Головний Спавн
-                            </div>
-                        </div>
-                        <div class="pt-3 px-2 pb-1">
-                            <h3 class="font-display font-bold text-slate-800 text-lg">Затишне містечко</h3>
-                            <p class="text-slate-500 text-sm mt-0.5">Зручний спавн із торговцями, порталами та місцями для відпочинку.</p>
-                        </div>
-                    </div>
-
-                    <!-- Фото 3 з папки а/ -->
-                    <div class="glass-card rounded-3xl p-3 shadow-sm hover:-translate-y-1 transition-all duration-300 group">
-                        <div class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-pastel-pink/30">
-                            <img src="а/photo3.jpg" alt="Атмосфера Ukr Smp 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="w-full h-full absolute inset-0 bg-gradient-to-br from-[#FFE5D9] via-[#FADADD] to-[#A2D2FF] flex-col items-center justify-center p-4 text-center hidden">
-                                <svg class="w-12 h-12 text-white/80 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                                <span class="font-display font-bold text-sm text-white drop-shadow-xs">а/photo3.jpg</span>
-                                <span class="text-[11px] text-white/90">Покладіть фото у папку «а»</span>
-                            </div>
-                            <div class="absolute top-3 left-3 bg-white/85 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-display font-bold text-orange-500">
-                                ✨ Світ Пригод
-                            </div>
-                        </div>
-                        <div class="pt-3 px-2 pb-1">
-                            <h3 class="font-display font-bold text-slate-800 text-lg">Спільні івенти</h3>
-                            <p class="text-slate-500 text-sm mt-0.5">Регулярні конкурси будівництва та захопливі ігри.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- ВКЛАДКА 2: ПРИДБАТИ ПРИВІЛЕГІЮ             -->
-        <!-- ========================================== -->
-        <section id="tab-donate" class="tab-content hidden">
-            <div class="min-h-[55vh] flex items-center justify-center">
-                <div class="glass-card rounded-[2.5rem] p-8 sm:p-14 max-w-xl w-full text-center shadow-sm relative overflow-hidden border-2 border-white">
-                    <!-- Декоративні кола -->
-                    <div class="absolute -top-12 -left-12 w-40 h-40 bg-pastel-peach/50 rounded-full blur-xl"></div>
-                    <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-pastel-blue/50 rounded-full blur-xl"></div>
-
-                    <div class="relative z-10 space-y-5">
-                        <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-[#FADADD] via-[#FFE5D9] to-[#BDE0FE] flex items-center justify-center shadow-sm">
-                            <i data-lucide="sparkles" class="w-10 h-10 text-rose-500"></i>
-                        </div>
-
-                        <h2 class="font-display font-black text-4xl sm:text-5xl bg-gradient-to-r from-rose-500 via-orange-400 to-sky-500 bg-clip-text text-transparent py-1">
-                            Скоро...
-                        </h2>
-
-                        <p class="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-                            Ми зараз готуємо для вас особливі, збалансовані привілегії та косметичні бонуси без впливу на чесну гру. Донат-магазин відкриється зовсім скоро!
+                        <p class="text-xs text-slate-400 mt-2.5 flex items-center justify-center lg:justify-start gap-2">
+                            <span>Натисніть кнопку, щоб скопіювати адресу та додати сервер у грі</span>
                         </p>
+                    </div>
+                </div>
 
-                        <div class="pt-2">
-                            <button onclick="switchTab('home')" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/90 hover:bg-white text-slate-700 font-display font-bold text-sm shadow-xs border border-pastel-pink transition-all cursor-pointer">
-                                <i data-lucide="arrow-left" class="w-4 h-4 text-rose-400"></i>
-                                <span>Повернутися на головну</span>
-                            </button>
+                <!-- Права колонка: Вбудований ігровий арт (Hero Banner) -->
+                <div class="lg:col-span-6">
+                    <div class="relative rounded-3xl p-2 bg-gradient-to-br from-sky-500/30 via-slate-800 to-amber-500/30 shadow-2xl border border-slate-700/60 group">
+                        <div class="relative overflow-hidden rounded-2xl bg-slate-950 aspect-[16/10]">
+                            <img id="hero-artwork" alt="Пейзаж сервера Ukr Smp на заході сонця" class="w-full h-full object-cover transform group-hover:scale-[1.02] transition-transform duration-500" />
+                            <!-- Плашка поверх зображення -->
+                            <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 px-4 py-2.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-white/10 flex items-center justify-between text-xs sm:text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-amber-400 font-bold">●</span>
+                                    <span class="font-semibold text-white">Світ Ukr Smp — Сезон 1</span>
+                                </div>
+                                <span class="text-sky-300 font-medium">Версія 1.21.8</span>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Переваги сервера -->
+    <section id="features" class="py-16 sm:py-20 border-t border-slate-800/70 bg-slate-950/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+                <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Особливості гри</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Чому саме Ukr Smp?</h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">Ми створили простір, де класичний Minecraft розкривається на повну завдяки активній спільноті та повазі одне до одного.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Картка 1 -->
+                <div class="p-6 rounded-2xl bg-slateCard border border-slate-800 hover:border-sky-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 mb-5 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Версія 1.21.8</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Усі найсвіжіші механіки та біоми: Блідий Сад, скрипуни, Палаци Випробувань, булава та нові декоративні блоки.</p>
+                </div>
+
+                <!-- Картка 2 -->
+                <div class="p-6 rounded-2xl bg-slateCard border border-slate-800 hover:border-amber-400/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 mb-5 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Дружнє ком'юніті</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Тільки україномовні гравці, спільні івенти, будівництво міст, кооперативні ферми та лампове спілкування.</p>
+                </div>
+
+                <!-- Картка 3 -->
+                <div class="p-6 rounded-2xl bg-slateCard border border-slate-800 hover:border-emerald-400/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Чесна гра без P2W</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Жодних привілеїв, що дають перевагу в ресурсах чи PvP. Усі гравці знаходяться в абсолютно рівних умовах.</p>
+                </div>
+
+                <!-- Картка 4 -->
+                <div class="p-6 rounded-2xl bg-slateCard border border-slate-800 hover:border-purple-400/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-5 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Затишна атмосфера</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Торговий квартал на довірі, гарні дороги між базами та відсутність потворних стовпів чи зруйнованого ландшафту.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Галерея Сервера (Вбудовані скриншоти/ілюстрації) -->
+    <section id="gallery" class="py-16 sm:py-24 border-t border-slate-800/70">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Атмосфера світу</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Галерея Сервера</h2>
+                </div>
+                <p class="text-sm text-slate-400 max-w-md">Натисніть на будь-який скриншот, щоб роздивитися локації Ukr Smp у збільшеному форматі.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Картка галереї 1 -->
+                <div onclick="openLightbox('shot-spawn', 'Спавн та Торговий Квартал', 'Центральна площа Ukr Smp з ятками гравців, ліхтарями та затишними доріжками для обміну ресурсами.')" class="group cursor-pointer rounded-2xl bg-slateCard border border-slate-800 overflow-hidden hover:border-amber-400/60 transition-all shadow-xl">
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                        <img id="shot-spawn" alt="Спавн та Торговий Квартал" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-sm text-xs font-semibold text-amber-300 border border-white/10">
+                            Спавн
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">Спавн та Торговий Квартал</h3>
+                        <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">Центральна площа з крамничками гравців, ліхтарями та зручними шляхами до всіх куточків світу.</p>
+                    </div>
+                </div>
+
+                <!-- Картка галереї 2 -->
+                <div onclick="openLightbox('shot-bases', 'Затишні Поселення Гравців', 'Мальовничі будиночки біля річки, деревʼяні містки та доглянуті пшеничні поля учасників сервера.')" class="group cursor-pointer rounded-2xl bg-slateCard border border-slate-800 overflow-hidden hover:border-sky-400/60 transition-all shadow-xl">
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                        <img id="shot-bases" alt="Затишні Поселення Гравців" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-sm text-xs font-semibold text-sky-300 border border-white/10">
+                            Будівництво
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-white group-hover:text-sky-300 transition-colors">Затишні Поселення Гравців</h3>
+                        <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">Мальовничі будиночки біля річки, дерев'яні містки, ферми та спільні проєкти учасників сервера.</p>
+                    </div>
+                </div>
+
+                <!-- Картка галереї 3 -->
+                <div onclick="openLightbox('shot-explore', 'Дослідження Світу 1.21.8', 'Загадковий Блідий Сад у сутінках, стародавні руїни та підземелля, сповнені пригод і рідкісних скарбів.')" class="group cursor-pointer rounded-2xl bg-slateCard border border-slate-800 overflow-hidden hover:border-emerald-400/60 transition-all shadow-xl">
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                        <img id="shot-explore" alt="Дослідження Світу 1.21.8" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div class="absolute top-3 right-3 px-2.5 py-1 rounded-lg bg-slate-950/75 backdrop-blur-sm text-xs font-semibold text-emerald-300 border border-white/10">
+                            1.21.8
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Дослідження Світу 1.21.8</h3>
+                        <p class="text-sm text-slate-400 mt-1.5 leading-relaxed">Загадковий Блідий Сад, Палаци Випробувань та глибокі печери для спільних експедицій.</p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- ========================================== -->
-        <!-- ВКЛАДКА 3: ПРАВИЛА                         -->
-        <!-- ========================================== -->
-        <section id="tab-rules" class="tab-content hidden space-y-6">
-            
-            <!-- Заголовок розділу правил -->
-            <div class="glass-card rounded-3xl p-6 sm:p-8 text-center space-y-3">
-                <h2 class="font-display font-black text-3xl text-slate-800">Правила сервера Ukr Smp</h2>
-                <p class="text-slate-600 max-w-xl mx-auto text-sm sm:text-base">
-                    Дотримання простих правил допомагає зберігати нашу затишну та дружню атмосферу. Незнання правил не звільняє від відповідальності.
-                </p>
-
-                <!-- Перемикач підрозділів: "Бан і Мут" та "Правила сервера" -->
-                <div class="pt-3 flex flex-wrap items-center justify-center gap-3">
-                    <button id="subnav-server" onclick="switchRuleSubtab('server')" class="flex items-center gap-2 px-5 py-3 rounded-2xl font-display font-bold text-sm transition-all bg-gradient-to-r from-[#BDE0FE] to-[#D8E2DC] text-slate-800 shadow-xs cursor-pointer">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-sky-600"></i>
-                        <span>Правила сервера</span>
-                    </button>
-
-                    <button id="subnav-punishments" onclick="switchRuleSubtab('punishments')" class="flex items-center gap-2 px-5 py-3 rounded-2xl font-display font-bold text-sm transition-all bg-white/70 text-slate-600 hover:bg-white cursor-pointer">
-                        <i data-lucide="gavel" class="w-4 h-4 text-rose-500"></i>
-                        <span>Бан і Мут</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- ПІДРОЗДІЛ 3.1: ПРАВИЛА СЕРВЕРА -->
-            <div id="rules-sub-server" class="tab-content grid grid-cols-1 md:grid-cols-2 gap-5">
-                <!-- Картка 1: Спілкування -->
-                <div class="glass-card rounded-3xl p-6 space-y-3 border-l-4 border-l-pastel-rose">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2.5 rounded-2xl bg-cream-pink text-rose-500">
-                            <i data-lucide="message-circle-heart" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="font-display font-extrabold text-lg text-slate-800">1. Культура спілкування</h3>
-                    </div>
-                    <ul class="space-y-2.5 text-slate-600 text-sm">
-                        <li class="flex items-start gap-2">
-                            <span class="text-rose-400 font-bold">•</span>
-                            <span><strong>Не матюкатися</strong> в загальному чаті та не використовувати завуальовану нецензурну лексику.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-rose-400 font-bold">•</span>
-                            <span>Поважайте інших гравців та адміністрацію, не провокуйте конфлікти.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-rose-400 font-bold">•</span>
-                            <span>Заборонено випрошувати ресурси або привілегії у персоналу сервера.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Картка 2: Будівництво та ландшафт -->
-                <div class="glass-card rounded-3xl p-6 space-y-3 border-l-4 border-l-pastel-peach">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2.5 rounded-2xl bg-cream-peach text-orange-500">
-                            <i data-lucide="trees" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="font-display font-extrabold text-lg text-slate-800">2. Будівництво та природа</h3>
-                    </div>
-                    <ul class="space-y-2.5 text-slate-600 text-sm">
-                        <li class="flex items-start gap-2">
-                            <span class="text-orange-400 font-bold">•</span>
-                            <span><strong>Не будувати стовпи</strong> в небо (1x1 блок) та хаотичні глибокі ями у світі.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-orange-400 font-bold">•</span>
-                            <span>Не псуйте ландшафт навколо чужих баз та не залишайте некрасиві неорганізовані споруди.</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-orange-400 font-bold">•</span>
-                            <span>Заборонено будувати непристойні споруди або конструкції, що навантажують сервер.</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Картка 3: Чесна гра -->
-                <div class="glass-card rounded-3xl p-6 space-y-3 border-l-4 border-l-pastel-sky md:col-span-2">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2.5 rounded-2xl bg-pastel-blue/40 text-sky-600">
-                            <i data-lucide="handshake" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="font-display font-extrabold text-lg text-slate-800">3. Взаємодія між гравцями</h3>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-600 text-sm">
-                        <div class="flex items-start gap-2">
-                            <span class="text-sky-500 font-bold">•</span>
-                            <span>Не заважайте гравцям на їхній території, якщо вони попросили вас піти.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="text-sky-500 font-bold">•</span>
-                            <span>Дотримуйтеся умов обміну та торгівлі — обман при угодах суворо карається.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ПІДРОЗДІЛ 3.2: БАН І МУТ -->
-            <div id="rules-sub-punishments" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Як приєднатися та Правила -->
+    <section class="py-16 sm:py-24 border-t border-slate-800/70 bg-slate-950/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 
-                <!-- Блок МУТ -->
-                <div class="glass-card rounded-3xl p-6 sm:p-7 space-y-4 border-t-4 border-t-pastel-peach">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="p-3 rounded-2xl bg-cream-peach text-orange-500">
-                                <i data-lucide="volume-x" class="w-6 h-6"></i>
+                <!-- Як приєднатися (7 колонок) -->
+                <div id="join" class="lg:col-span-7 space-y-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Швидкий старт</span>
+                        <h2 class="text-3xl font-extrabold text-white mt-2">Як приєднатися до гри?</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Крок 1 -->
+                        <div class="p-5 rounded-2xl bg-slateCard border border-slate-800 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-300 font-pixel text-sm flex items-center justify-center shrink-0 border border-sky-500/30">
+                                1
                             </div>
                             <div>
-                                <h3 class="font-display font-black text-xl text-slate-800">За що дають МУТ</h3>
-                                <span class="text-xs font-semibold text-orange-500">Тимчасове блокування чату (від 15 хв до 24 год)</span>
+                                <h3 class="text-base sm:text-lg font-bold text-white">Запустіть Minecraft Java Edition 1.21.8</h3>
+                                <p class="text-sm text-slate-400 mt-1">Оберіть у вашому лаунчері версію <strong>1.21.8</strong> (підтримуються офіційний лаунчер, Prism, MultiMC та інші).</p>
+                            </div>
+                        </div>
+
+                        <!-- Крок 2 -->
+                        <div class="p-5 rounded-2xl bg-slateCard border border-slate-800 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 font-pixel text-sm flex items-center justify-center shrink-0 border border-amber-400/30">
+                                2
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-base sm:text-lg font-bold text-white">Додайте сервер Ukr Smp</h3>
+                                <p class="text-sm text-slate-400 mt-1">Перейдіть у меню «Мережева гра» → «Додати сервер» та вставте нашу адресу:</p>
+                                <div class="mt-3 inline-flex items-center gap-3 px-3.5 py-2 rounded-xl bg-obsidian border border-slate-700">
+                                    <code class="text-sm font-bold text-amber-300">UkrSmpUa.aternos.me</code>
+                                    <button onclick="copyServerIP()" class="text-xs font-semibold text-sky-400 hover:text-sky-300 underline cursor-pointer">Копіювати</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Крок 3 -->
+                        <div class="p-5 rounded-2xl bg-slateCard border border-slate-800 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 font-pixel text-sm flex items-center justify-center shrink-0 border border-emerald-500/30">
+                                3
+                            </div>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-bold text-white">Почніть свою історію</h3>
+                                <p class="text-sm text-slate-400 mt-1">Привітайтеся в чаті, оберіть вільну територію подалі від чужих баз та будуйте власний світ!</p>
                             </div>
                         </div>
                     </div>
-
-                    <ul class="space-y-3 text-sm text-slate-600 pt-1">
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-peach text-orange-600 font-display font-bold text-xs mt-0.5">1.1</span>
-                            <div>
-                                <strong class="text-slate-800 block">Мат та образи гравців</strong>
-                                <span>Використання нецензурних слів, приниження або токсична поведінка в чаті.</span>
-                            </div>
-                        </li>
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-peach text-orange-600 font-display font-bold text-xs mt-0.5">1.2</span>
-                            <div>
-                                <strong class="text-slate-800 block">Флуд, спам та КАПС</strong>
-                                <span>Надсилання однакових повідомлень або зловживання великими літерами.</span>
-                            </div>
-                        </li>
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-peach text-orange-600 font-display font-bold text-xs mt-0.5">1.3</span>
-                            <div>
-                                <strong class="text-slate-800 block">Реклама сторонніх ресурсів</strong>
-                                <span>Згадка IP-адрес інших серверів або підозрілих посилань без дозволу.</span>
-                            </div>
-                        </li>
-                    </ul>
                 </div>
 
-                <!-- Блок БАН -->
-                <div class="glass-card rounded-3xl p-6 sm:p-7 space-y-4 border-t-4 border-t-rose-400">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="p-3 rounded-2xl bg-cream-pink text-rose-500">
-                                <i data-lucide="ban" class="w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-display font-black text-xl text-slate-800">За що дають БАН</h3>
-                                <span class="text-xs font-semibold text-rose-500">Блокування доступу до сервера (від 1 дня до назавжди)</span>
-                            </div>
+                <!-- Основні правила (5 колонок) -->
+                <div id="rules" class="lg:col-span-5">
+                    <div class="h-full p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-slateCard to-slate-900 border border-slate-800 shadow-xl flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Кодекс гравця</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Основні правила</h2>
+                            <p class="text-sm text-slate-400 mt-2">Прості принципи, що зберігають комфорт кожного учасника Ukr Smp:</p>
+
+                            <ul class="mt-6 space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">✕</span>
+                                    <div>
+                                        <span class="font-bold text-white text-sm sm:text-base">Жодного гріферства та крадіжок</span>
+                                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Не ламайте чужі будівлі та не беріть речі зі скринь без дозволу власника.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">♥</span>
+                                    <div>
+                                        <span class="font-bold text-white text-sm sm:text-base">Повага до спільноти</span>
+                                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Спілкуємося українською, підтримуємо новачків та уникаємо токсичності в чаті.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">!</span>
+                                    <div>
+                                        <span class="font-bold text-white text-sm sm:text-base">Заборона чітів та X-Ray</span>
+                                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Дозволені лише оптимізаційні моди (Sodium, Iris), мінікарти без печер та Litematica.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">✓</span>
+                                    <div>
+                                        <span class="font-bold text-white text-sm sm:text-base">PvP лише за взаємною згодою</span>
+                                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Дуелі на арені або за домовленістю сторін з поверненням речей.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8 pt-5 border-t border-slate-800 text-xs text-slate-400">
+                            Дотримання правил гарантує приємну гру для кожного гравця Ukr Smp.
                         </div>
                     </div>
-
-                    <ul class="space-y-3 text-sm text-slate-600 pt-1">
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-pink text-rose-600 font-display font-bold text-xs mt-0.5">2.1</span>
-                            <div>
-                                <strong class="text-slate-800 block">Використання чітів та X-Ray</strong>
-                                <span>Будь-які сторонні модифікації, що дають нечесну перевагу у грі.</span>
-                            </div>
-                        </li>
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-pink text-rose-600 font-display font-bold text-xs mt-0.5">2.2</span>
-                            <div>
-                                <strong class="text-slate-800 block">Гріферство та крадіжка</strong>
-                                <span>Руйнування чужих будівель, викрадення речей зі скринь без дозволу.</span>
-                            </div>
-                        </li>
-                        <li class="p-3 rounded-2xl bg-white/70 flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded-lg bg-cream-pink text-rose-600 font-display font-bold text-xs mt-0.5">2.3</span>
-                            <div>
-                                <strong class="text-slate-800 block">Дюп речей та багоюз</strong>
-                                <span>Використання помилок гри для розмноження предметів.</span>
-                            </div>
-                        </li>
-                    </ul>
                 </div>
 
             </div>
-        </section>
+        </div>
+    </section>
 
-    </main>
+    <!-- Футер -->
+    <footer class="border-t border-slate-800/80 bg-obsidian py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-b from-sky-400 to-amber-400 flex items-center justify-center font-pixel text-[10px] text-slate-950 font-bold">
+                    UA
+                </div>
+                <div>
+                    <p class="font-bold text-white">Ukr Smp</p>
+                    <p class="text-xs text-slate-400">Український сервер Minecraft Java 1.21.8</p>
+                </div>
+            </div>
 
-    <!-- Нижній колонтитул (Footer) -->
-    <footer class="px-4 py-6 text-center text-slate-500 text-xs">
-        <div class="max-w-5xl mx-auto glass-card rounded-2xl py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p class="font-medium">© 2026 <span class="font-display font-bold text-slate-700">Ukr Smp</span>. Усі права захищено.</p>
-            <p class="text-slate-400">Сервер не пов'язаний із Mojang AB чи Microsoft.</p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <span class="text-xs text-slate-400">Адреса сервера:</span>
+                <button onclick="copyServerIP()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300 font-mono text-xs sm:text-sm font-bold transition-colors cursor-pointer">
+                    UkrSmpUa.aternos.me
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 text-center md:text-right">
+                © 2026 Ukr Smp. Не є офіційним продуктом Mojang або Microsoft.
+            </p>
         </div>
     </footer>
 
-    <!-- Логіка перемикання вкладок та копіювання IP -->
+    <!-- Модальне вікно перегляду скриншотів (Lightbox) -->
+    <div id="lightbox" onclick="closeLightbox()" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center">
+        <div onclick="event.stopPropagation()" class="relative max-w-4xl w-full bg-slateCard border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
+            <button onclick="closeLightbox()" aria-label="Закрити" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-800 text-white flex items-center justify-center border border-white/15 transition-colors cursor-pointer">
+                ✕
+            </button>
+            <img id="lightbox-img" src="" alt="" class="w-full max-h-[70vh] object-cover bg-slate-950" />
+            <div class="p-6">
+                <h3 id="lightbox-title" class="text-xl font-bold text-white"></h3>
+                <p id="lightbox-desc" class="text-sm text-slate-300 mt-1.5"></p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Ініціалізація іконок Lucide після завантаження DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-        });
+        const SERVER_IP = 'UkrSmpUa.aternos.me';
+        let toastTimeout = null;
 
         /**
-         * Перемикання між основними вкладками: 'home', 'donate', 'rules'
+         * Копіювання IP-адреси в буфер обміну з резервним методом для iframe
          */
-        function switchTab(tabName) {
-            // Приховуємо всі секції
-            const tabs = ['home', 'donate', 'rules'];
-            tabs.forEach(t => {
-                const section = document.getElementById(`tab-${t}`);
-                const btn = document.getElementById(`nav-${t}`);
-                
-                if (t === tabName) {
-                    section.classList.remove('hidden');
-                    // Активний стиль кнопки навігації
-                    btn.classList.add('bg-gradient-to-r', 'from-[#FADADD]', 'to-[#FFE5D9]', 'text-slate-800', 'shadow-sm');
-                    btn.classList.remove('text-slate-600', 'hover:bg-white/60');
-                } else {
-                    section.classList.add('hidden');
-                    // Неактивний стиль кнопки навігації
-                    btn.classList.remove('bg-gradient-to-r', 'from-[#FADADD]', 'to-[#FFE5D9]', 'text-slate-800', 'shadow-sm');
-                    btn.classList.add('text-slate-600', 'hover:bg-white/60');
+        function copyServerIP() {
+            const textArea = document.createElement('textarea');
+            textArea.value = SERVER_IP;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showToast('IP скопійовано: ' + SERVER_IP);
+                const btnLabel = document.getElementById('hero-copy-label');
+                if (btnLabel) {
+                    btnLabel.textContent = 'IP скопійовано!';
+                    setTimeout(() => {
+                        btnLabel.textContent = 'Скопіювати IP';
+                    }, 2200);
                 }
-            });
-
-            // Плавна прокрутка вгору на мобільних пристроях
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        /**
-         * Перемикання підвкладок у розділі "Правила": 'server' та 'punishments'
-         */
-        function switchRuleSubtab(subtabName) {
-            const serverSection = document.getElementById('rules-sub-server');
-            const punishmentsSection = document.getElementById('rules-sub-punishments');
-            const serverBtn = document.getElementById('subnav-server');
-            const punishmentsBtn = document.getElementById('subnav-punishments');
-
-            if (subtabName === 'server') {
-                serverSection.classList.remove('hidden');
-                punishmentsSection.classList.add('hidden');
-
-                serverBtn.classList.add('bg-gradient-to-r', 'from-[#BDE0FE]', 'to-[#D8E2DC]', 'text-slate-800', 'shadow-xs');
-                serverBtn.classList.remove('bg-white/70', 'text-slate-600', 'hover:bg-white');
-
-                punishmentsBtn.classList.remove('bg-gradient-to-r', 'from-[#FADADD]', 'to-[#FFE5D9]', 'text-slate-800', 'shadow-xs');
-                punishmentsBtn.classList.add('bg-white/70', 'text-slate-600', 'hover:bg-white');
-            } else {
-                punishmentsSection.classList.remove('hidden');
-                serverSection.classList.add('hidden');
-
-                punishmentsBtn.classList.add('bg-gradient-to-r', 'from-[#FADADD]', 'to-[#FFE5D9]', 'text-slate-800', 'shadow-xs');
-                punishmentsBtn.classList.remove('bg-white/70', 'text-slate-600', 'hover:bg-white');
-
-                serverBtn.classList.remove('bg-gradient-to-r', 'from-[#BDE0FE]', 'to-[#D8E2DC]', 'text-slate-800', 'shadow-xs');
-                serverBtn.classList.add('bg-white/70', 'text-slate-600', 'hover:bg-white');
+            } catch (err) {
+                showToast('Адреса сервера: ' + SERVER_IP);
             }
+            document.body.removeChild(textArea);
         }
 
-        /**
-         * Копіювання IP-адреси в буфер обміну з показом красивого повідомлення
-         */
-        let toastTimeout;
-        function copyIP() {
-            const ipText = document.getElementById('server-ip').innerText;
-            
-            // Надійне копіювання через тимчасове поле (працює навіть в iframe)
-            const tempInput = document.createElement('textarea');
-            tempInput.value = ipText;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-
-            // Показ сповіщення
+        function showToast(message) {
             const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            msgEl.textContent = message;
             toast.classList.remove('translate-y-24', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
 
@@ -568,6 +481,396 @@
                 toast.classList.remove('translate-y-0', 'opacity-100');
             }, 2800);
         }
+
+        /**
+         * Відкриття та закриття модального вікна галереї
+         */
+        function openLightbox(imgId, title, desc) {
+            const sourceImg = document.getElementById(imgId);
+            const lightbox = document.getElementById('lightbox');
+            document.getElementById('lightbox-img').src = sourceImg.src;
+            document.getElementById('lightbox-title').textContent = title;
+            document.getElementById('lightbox-desc').textContent = desc;
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        /**
+         * Допоміжні функції для процедурної генерації воксельних ілюстрацій Minecraft
+         */
+        function drawVoxelBlock(ctx, x, y, w, h, topColor, frontColor, borderColor = 'rgba(0,0,0,0.18)') {
+            ctx.fillStyle = frontColor;
+            ctx.fillRect(x, y, w, h);
+            if (topColor) {
+                ctx.fillStyle = topColor;
+                ctx.fillRect(x, y, w, Math.max(3, Math.floor(h * 0.28)));
+            }
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+        }
+
+        function drawMinecraftTree(ctx, cx, baseY, scale = 1) {
+            const b = Math.round(14 * scale);
+            // Стовбур
+            for (let i = 1; i <= 3; i++) {
+                drawVoxelBlock(ctx, cx - b / 2, baseY - i * b, b, b, '#7c5332', '#5c3a21');
+            }
+            // Крона
+            const leaves = [
+                [-2, 3], [-1, 3], [0, 3], [1, 3], [2, 3],
+                [-2, 4], [-1, 4], [0, 4], [1, 4], [2, 4],
+                [-1, 5], [0, 5], [1, 5],
+                [0, 6]
+            ];
+            leaves.forEach(([dx, dy]) => {
+                const shade = (dx + dy) % 2 === 0 ? '#2f853b' : '#256d2f';
+                drawVoxelBlock(ctx, cx + dx * b - b / 2, baseY - dy * b, b, b, '#46a853', shade);
+            });
+        }
+
+        function drawCozyHouse(ctx, x, groundY, wBlocks, hBlocks, roofColor = '#9a3412', wallColor = '#d6a874') {
+            const b = 16;
+            const houseW = wBlocks * b;
+            const houseH = hBlocks * b;
+            const startY = groundY - houseH;
+
+            // Кам'яний фундамент
+            for (let i = 0; i < wBlocks; i++) {
+                drawVoxelBlock(ctx, x + i * b, groundY - b, b, b, '#94a3b8', '#64748b');
+            }
+            // Дерев'яні стіни
+            for (let row = 1; row < hBlocks; row++) {
+                for (let col = 0; col < wBlocks; col++) {
+                    const isPillar = col === 0 || col === wBlocks - 1;
+                    drawVoxelBlock(
+                        ctx,
+                        x + col * b,
+                        groundY - (row + 1) * b,
+                        b,
+                        b,
+                        isPillar ? '#6b4423' : '#e2b887',
+                        isPillar ? '#523218' : wallColor
+                    );
+                }
+            }
+            // Вікна, що світяться теплим світлом
+            const winY = groundY - 2 * b;
+            drawVoxelBlock(ctx, x + b + 2, winY + 2, b - 4, b - 4, '#fef08a', '#fde047');
+            if (wBlocks >= 5) {
+                drawVoxelBlock(ctx, x + (wBlocks - 2) * b + 2, winY + 2, b - 4, b - 4, '#fef08a', '#fde047');
+            }
+            // Двері
+            const doorX = x + Math.floor(wBlocks / 2) * b;
+            drawVoxelBlock(ctx, doorX + 2, groundY - 2 * b + 2, b - 4, b * 2 - 2, '#78350f', '#451a03');
+
+            // Східчастий воксельний дах
+            const roofLayers = Math.ceil(wBlocks / 2) + 1;
+            for (let r = 0; r < roofLayers; r++) {
+                const span = wBlocks + 2 - r * 2;
+                if (span <= 0) break;
+                const rx = x - b + r * b;
+                const ry = startY - (r + 1) * (b * 0.75);
+                for (let c = 0; c < span; c++) {
+                    drawVoxelBlock(ctx, rx + c * b, ry, b, b * 0.85, '#ea580c', roofColor);
+                }
+            }
+        }
+
+        /**
+         * 1. Генерація головного банера (Hero Artwork): Український захід сонця, гори, будинок SMP, пшениця
+         */
+        function renderHeroBanner() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 960;
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+
+            // Небо у кольорах заходу сонця (блакитне зверху, золотисте біля горизонту)
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, 400);
+            skyGrad.addColorStop(0, '#0369a1');
+            skyGrad.addColorStop(0.55, '#38bdf8');
+            skyGrad.addColorStop(0.85, '#fde68a');
+            skyGrad.addColorStop(1, '#f59e0b');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, 960, 600);
+
+            // Квадратне сонце Minecraft з шейдерним сяйвом
+            const sunGlow = ctx.createRadialGradient(730, 170, 20, 730, 170, 210);
+            sunGlow.addColorStop(0, 'rgba(254, 249, 195, 0.95)');
+            sunGlow.addColorStop(0.4, 'rgba(253, 224, 71, 0.35)');
+            sunGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+            ctx.fillStyle = sunGlow;
+            ctx.fillRect(500, 0, 460, 400);
+
+            ctx.fillStyle = '#fef9c3';
+            ctx.fillRect(695, 135, 70, 70);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(705, 145, 50, 50);
+
+            // Воксельні хмари
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+            ctx.fillRect(110, 85, 130, 22);
+            ctx.fillRect(135, 68, 80, 18);
+            ctx.fillRect(420, 110, 150, 20);
+            ctx.fillRect(450, 95, 90, 16);
+
+            // Далекі гори
+            const mountainPeaks = [
+                { x: 0, w: 320, h: 190, c: '#334155' },
+                { x: 240, w: 360, h: 230, c: '#1e293b' },
+                { x: 540, w: 420, h: 175, c: '#334155' }
+            ];
+            mountainPeaks.forEach(m => {
+                const steps = 12;
+                const stepW = m.w / steps;
+                for (let i = 0; i < steps; i++) {
+                    const distFromCenter = Math.abs(i - steps / 2) / (steps / 2);
+                    const colH = Math.round(m.h * (1 - distFromCenter * 0.85));
+                    ctx.fillStyle = m.c;
+                    ctx.fillRect(m.x + i * stepW, 410 - colH, stepW + 1, colH);
+                    // Снігові вершини
+                    if (colH > 165) {
+                        ctx.fillStyle = '#e2e8f0';
+                        ctx.fillRect(m.x + i * stepW, 410 - colH, stepW + 1, 24);
+                    }
+                }
+            });
+
+            // Зелені пагорби та земля
+            const groundY = 420;
+            for (let gx = 0; gx < 960; gx += 20) {
+                const hillOffset = Math.round(Math.sin(gx * 0.008) * 18);
+                drawVoxelBlock(ctx, gx, groundY + hillOffset, 20, 200, '#4ade80', '#16a34a', 'rgba(0,0,0,0.08)');
+            }
+
+            // Пшеничне поле на передньому плані (символічний акцент)
+            for (let wx = 40; wx < 420; wx += 14) {
+                for (let wy = 465; wy < 575; wy += 18) {
+                    ctx.fillStyle = '#eab308';
+                    ctx.fillRect(wx, wy, 10, 14);
+                    ctx.fillStyle = '#fde047';
+                    ctx.fillRect(wx + 2, wy - 3, 6, 6);
+                }
+            }
+
+            // Водна річка праворуч із відблиском сонця
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(620, 455, 340, 145);
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.35)';
+            ctx.fillRect(685, 465, 95, 125);
+
+            // Дерева та затишний дім спавну
+            drawMinecraftTree(ctx, 130, 430, 1.15);
+            drawMinecraftTree(ctx, 560, 425, 1.25);
+            drawCozyHouse(ctx, 350, 435, 7, 3, '#b45309', '#e7c294');
+
+            // Ліхтар біля стежки
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(495, 395, 6, 42);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(491, 385, 14, 14);
+
+            // Водяний знак сервера в кутку
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+            ctx.fillRect(24, 24, 215, 38);
+            ctx.fillStyle = '#fde047';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('UKR SMP • 1.21.8', 40, 49);
+
+            document.getElementById('hero-artwork').src = canvas.toDataURL('image/png');
+        }
+
+        /**
+         * 2. Скриншот 1: Спавн та Торговий Квартал
+         */
+        function renderSpawnScreenshot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 500;
+            const ctx = canvas.getContext('2d');
+
+            // Ясний ранковий градієнт неба
+            const sky = ctx.createLinearGradient(0, 0, 0, 340);
+            sky.addColorStop(0, '#0284c7');
+            sky.addColorStop(1, '#bae6fd');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, 800, 500);
+
+            // Хмари
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillRect(90, 60, 120, 20);
+            ctx.fillRect(540, 80, 140, 22);
+
+            // Площа з кам'яної цегли та трави
+            for (let x = 0; x < 800; x += 20) {
+                drawVoxelBlock(ctx, x, 340, 20, 160, '#4ade80', '#15803d', 'rgba(0,0,0,0.08)');
+                drawVoxelBlock(ctx, x, 375, 20, 125, '#cbd5e1', '#64748b', 'rgba(0,0,0,0.14)');
+            }
+
+            // Торгові ятки з синьо-жовтими тентами
+            function drawMarketStall(sx, sy, awningA, awningB) {
+                // Стовпчики
+                ctx.fillStyle = '#5c3a21';
+                ctx.fillRect(sx + 8, sy - 65, 8, 65);
+                ctx.fillRect(sx + 104, sy - 65, 8, 65);
+                // Прилавок
+                drawVoxelBlock(ctx, sx, sy - 24, 120, 24, '#d6a874', '#92400e');
+                // Тент
+                for (let i = 0; i < 6; i++) {
+                    ctx.fillStyle = i % 2 === 0 ? awningA : awningB;
+                    ctx.fillRect(sx - 6 + i * 22, sy - 82, 22, 18);
+                }
+                // Скриня на прилавку
+                drawVoxelBlock(ctx, sx + 46, sy - 42, 28, 18, '#f59e0b', '#b45309');
+            }
+
+            drawMarketStall(70, 375, '#0057B7', '#FFD700');
+            drawMarketStall(605, 375, '#0057B7', '#FFD700');
+
+            // Центральна ратуша спавну
+            drawCozyHouse(ctx, 295, 375, 12, 4, '#1d4ed8', '#e2e8f0');
+
+            // Фонтан посеред площі
+            drawVoxelBlock(ctx, 340, 395, 120, 24, '#94a3b8', '#475569');
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(352, 390, 96, 12);
+            ctx.fillRect(392, 355, 16, 40);
+
+            document.getElementById('shot-spawn').src = canvas.toDataURL('image/png');
+        }
+
+        /**
+         * 3. Скриншот 2: Затишні Поселення Гравців
+         */
+        function renderBasesScreenshot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 500;
+            const ctx = canvas.getContext('2d');
+
+            // Теплий вечірній градієнт
+            const sky = ctx.createLinearGradient(0, 0, 0, 330);
+            sky.addColorStop(0, '#1e3a8a');
+            sky.addColorStop(0.6, '#3b82f6');
+            sky.addColorStop(1, '#fcd34d');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, 800, 500);
+
+            // Гори на фоні
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.moveTo(0, 330);
+            ctx.lineTo(180, 160);
+            ctx.lineTo(390, 330);
+            ctx.lineTo(610, 140);
+            ctx.lineTo(800, 330);
+            ctx.fill();
+
+            // Земля та річка посередині
+            for (let x = 0; x < 800; x += 20) {
+                drawVoxelBlock(ctx, x, 330, 20, 170, '#4ade80', '#166534', 'rgba(0,0,0,0.08)');
+            }
+            ctx.fillStyle = '#0ea5e9';
+            ctx.fillRect(310, 345, 180, 155);
+
+            // Дерев'яний місток через річку
+            for (let bx = 295; bx <= 495; bx += 20) {
+                const arc = Math.sin(((bx - 295) / 200) * Math.PI) * 14;
+                drawVoxelBlock(ctx, bx, 340 - arc, 20, 14, '#d97706', '#92400e');
+            }
+
+            // Два будинки гравців по обидва береги
+            drawCozyHouse(ctx, 110, 345, 6, 3, '#b91c1c', '#fde68a');
+            drawCozyHouse(ctx, 540, 345, 7, 3, '#047857', '#fed7aa');
+
+            drawMinecraftTree(ctx, 60, 345, 1.1);
+            drawMinecraftTree(ctx, 730, 345, 1.2);
+
+            document.getElementById('shot-bases').src = canvas.toDataURL('image/png');
+        }
+
+        /**
+         * 4. Скриншот 3: Дослідження Світу 1.21.8 (Блідий Сад / Pale Garden)
+         */
+        function renderExploreScreenshot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 500;
+            const ctx = canvas.getContext('2d');
+
+            // Містичне сутінкове небо Блідого Саду (Pale Garden 1.21.4+)
+            const sky = ctx.createLinearGradient(0, 0, 0, 360);
+            sky.addColorStop(0, '#0f172a');
+            sky.addColorStop(0.6, '#334155');
+            sky.addColorStop(1, '#64748b');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, 800, 500);
+
+            // Повний місяць
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(620, 65, 56, 56);
+
+            // Блідий мох та земля
+            for (let x = 0; x < 800; x += 20) {
+                drawVoxelBlock(ctx, x, 355, 20, 145, '#94a3b8', '#475569', 'rgba(0,0,0,0.2)');
+            }
+
+            // Бліді дуби (Pale Oaks)
+            function drawPaleTree(tx, ty, h) {
+                for (let i = 1; i <= h; i++) {
+                    drawVoxelBlock(ctx, tx, ty - i * 18, 18, 18, '#cbd5e1', '#64748b');
+                }
+                for (let lx = -3; lx <= 3; lx++) {
+                    for (let ly = h; ly <= h + 2; ly++) {
+                        if (Math.abs(lx) === 3 && ly === h + 2) continue;
+                        drawVoxelBlock(ctx, tx + lx * 18, ty - ly * 18, 18, 18, '#cbd5e1', '#94a3b8');
+                    }
+                }
+                // Звисаючий блідий мох
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(tx - 32, ty - (h - 1) * 18, 6, 28);
+                ctx.fillRect(tx + 38, ty - (h - 1) * 18, 6, 34);
+            }
+
+            drawPaleTree(150, 355, 6);
+            drawPaleTree(370, 355, 7);
+            drawPaleTree(630, 355, 6);
+
+            // Скрипун (Creaking) із трьома помаранчевими очима, що світяться в темряві
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(485, 285, 24, 70);
+            ctx.fillRect(480, 262, 34, 24);
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(486, 268, 6, 6);
+            ctx.fillRect(502, 268, 6, 6);
+            ctx.fillRect(494, 276, 6, 5);
+
+            // Гравець із факелом
+            drawVoxelBlock(ctx, 250, 315, 18, 40, '#38bdf8', '#0284c7');
+            drawVoxelBlock(ctx, 250, 297, 18, 18, '#fed7aa', '#fdba74');
+            // Факел
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(272, 312, 5, 18);
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(270, 305, 9, 9);
+
+            document.getElementById('shot-explore').src = canvas.toDataURL('image/png');
+        }
+
+        window.onload = function () {
+            renderHeroBanner();
+            renderSpawnScreenshot();
+            renderBasesScreenshot();
+            renderExploreScreenshot();
+        };
     </script>
 </body>
 </html>
